@@ -1,4 +1,11 @@
-/* IDEA EXPLOSION - app.js - fichier complet */
+/* ==========================================================================
+   IDEA EXPLOSION - app.js
+   Routeur d'ecrans + les 6 ecrans + toutes les interactions.
+   --------------------------------------------------------------------------
+   Correctif de navigation : apres la generation, l'application NAVIGUE vers
+   l'ecran de resultat. Auparavant l'idee etait creee et le toast s'affichait,
+   mais l'utilisateur restait bloque sur la Fusion Chamber d'ou venait l'appel.
+   ========================================================================== */
 (function () {
   "use strict";
 
@@ -227,6 +234,8 @@
       App.busy = false;
       App.currentIdea = idea;
       App.lastGenerated = idea;
+      App.stack.push("fusion");
+      App.screen = "explosion";
       render();
       var stage = document.querySelector(".explosion-stage");
       if (stage) {
