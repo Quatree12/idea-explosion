@@ -1,4 +1,4 @@
-/* IDEA EXPLOSION - app.js (partie 1/2) - routeur + ecrans 1 a 4 */
+/* IDEA EXPLOSION - app.js - fichier complet (routeur + 6 ecrans) */
 (function () {
   "use strict";
   var el = IE_UI.el, UI = IE_UI, E = IE_ENGINE, S = IE_STORE, D = IE_DATA;
