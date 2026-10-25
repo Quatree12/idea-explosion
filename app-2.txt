@@ -4,7 +4,6 @@
   function renderTree() {
     var kids = [];
     var idea = App.currentIdea;
-
     if (!idea) {
       kids.push(head("Mutation Tree", "aucune idée active", { back: true }));
       kids.push(el("div", { class: "empty" }, [
@@ -32,7 +31,6 @@
     ]));
 
     var branch = el("div", { class: "branch" });
-
     if (!children.length) {
       branch.appendChild(el("p", { class: "faint", style: "font-size:13.5px;margin:12px 0", text: "Aucune variante pour l'instant. Utilise les actions ci-dessous." }));
     } else {
@@ -42,12 +40,9 @@
             el("div", { class: "n-name", text: child.name }),
             el("div", { class: "n-meta", text: (child.mutationLabel || "variante") + " · " + UI.relTime(child.createdAt) })
           ]),
-          el("button", {
-            class: "icon-sm", type: "button", "aria-label": "Ouvrir la variante " + child.name,
-            onclick: function () { openIdea(child.id); }
-          }, [UI.icon("doc")]),
-          el("button", {
-            class: "icon-sm", type: "button", "aria-label": "Supprimer la variante " + child.name,
+          el("button", { class: "icon-sm", type: "button", "aria-label": "Ouvrir la variante " + child.name,
+            onclick: function () { openIdea(child.id); } }, [UI.icon("doc")]),
+          el("button", { class: "icon-sm", type: "button", "aria-label": "Supprimer la variante " + child.name,
             onclick: function () {
               UI.confirm({ title: "Supprimer cette variante ?", subtitle: child.name, confirmLabel: "Supprimer", danger: true }).then(function (yes) {
                 if (!yes) return;
@@ -71,25 +66,19 @@
 
     var options = E.mutationOptions(root.combo);
     kids.push(el("div", { class: "chip-grid" }, options.map(function (opt) {
-      return el("button", {
-        class: "chip", type: "button",
-        onclick: function () { runMutation(root, opt); }
-      }, [
+      return el("button", { class: "chip", type: "button", onclick: function () { runMutation(root, opt); } }, [
         el("span", { class: "glyph", text: opt.random ? "✳" : "⇄", "aria-hidden": "true" }),
         el("span", { text: opt.label })
       ]);
     })));
 
     kids.push(el("div", { class: "btn-row", style: "margin-top:16px" }, [
-      el("button", { class: "btn btn-ghost", type: "button", onclick: function () { openIdea(root.id); } },
-        [document.createTextNode("Voir l'originale")]),
-      S.get(rootId) ? el("button", { class: "btn btn-ghost", type: "button", onclick: function () { go("vault"); } },
-        [document.createTextNode("Vault")]) : null
+      el("button", { class: "btn btn-ghost", type: "button", onclick: function () { openIdea(root.id); } }, [document.createTextNode("Voir l'originale")]),
+      S.get(rootId) ? el("button", { class: "btn btn-ghost", type: "button", onclick: function () { go("vault"); } }, [document.createTextNode("Vault")]) : null
     ]));
 
     kids.push(el("div", { style: "height:16px" }));
     kids.push(note("Une variante est générée localement à partir d'un axe de mutation : le moteur déplace un ingrédient puis recompose le concept.", ""));
-
     return screenEl(kids, "tree");
   }
 
@@ -114,10 +103,7 @@
   }
 
   function doMutate(root, opt) {
-    if (opt.random || opt.pool === null) {
-      finishMutation(root, E.mutate(root, "remix"));
-      return;
-    }
+    if (opt.random || opt.pool === null) { finishMutation(root, E.mutate(root, "remix")); return; }
     if (opt.op === "addTwist") { openPicker(root, opt, "Choisir un twist à ajouter"); return; }
     if (opt.op === "changeKind") { openPicker(root, opt, "Choisir le nouveau format"); return; }
     finishMutation(root, E.mutate(root, opt.op));
@@ -126,12 +112,8 @@
   function openPicker(root, opt, title) {
     var wrap = el("div", {});
     opt.pool.forEach(function (item) {
-      wrap.appendChild(el("button", {
-        class: "option-row", type: "button",
-        onclick: function () {
-          UI.closeModal();
-          finishMutation(root, E.mutate(root, opt.op, item.id));
-        }
+      wrap.appendChild(el("button", { class: "option-row", type: "button",
+        onclick: function () { UI.closeModal(); finishMutation(root, E.mutate(root, opt.op, item.id)); }
       }, [
         el("span", { class: "o-glyph", text: item.glyph }),
         el("div", { class: "o-body" }, [
@@ -200,14 +182,11 @@
       { id: "all", label: "Tout" }, { id: "favorite", label: "Favoris" },
       { id: "variant", label: "Variantes" }, { id: "archived", label: "Archivées" }
     ].concat(D.KINDS.map(function (k) { return { id: k.id, label: k.label }; }));
-
     kids.push(el("div", { class: "filters", role: "group", "aria-label": "Filtres" }, filters.map(function (f) {
       return chip({ glyph: "", label: f.label }, App.vaultFilter === f.id, function () { App.vaultFilter = f.id; render(); });
     })));
 
-    var sorts = [
-      { id: "recent", label: "Récentes" }, { id: "name", label: "A→Z" }, { id: "difficulty", label: "Difficulté" }
-    ];
+    var sorts = [{ id: "recent", label: "Récentes" }, { id: "name", label: "A→Z" }, { id: "difficulty", label: "Difficulté" }];
     kids.push(el("div", { class: "filters", style: "margin-top:10px", role: "group", "aria-label": "Tri" }, sorts.map(function (s) {
       return chip({ glyph: "", label: "Tri : " + s.label }, App.vaultSort === s.id, function () { App.vaultSort = s.id; render(); });
     })));
@@ -222,8 +201,7 @@
           UI.confirm({ title: "Vider tout le Vault ?", subtitle: stats.total + " idée(s) seront supprimées définitivement. Cette action n'est pas annulable.", confirmLabel: "Tout supprimer", danger: true }).then(function (yes) {
             if (!yes) return;
             var n = S.clearAll();
-            App.currentIdea = null;
-            updateBadge();
+            App.currentIdea = null; updateBadge();
             UI.toast(n + " idée(s) supprimée(s).", "info");
             render();
           });
@@ -242,7 +220,6 @@
   function computeList() {
     var q = App.vaultQuery.trim().toLowerCase();
     var list = S.ideas().slice();
-
     if (App.vaultFilter === "favorite") list = list.filter(function (i) { return i.favorite && !i.archived; });
     else if (App.vaultFilter === "variant") list = list.filter(function (i) { return !!i.parentId && !i.archived; });
     else if (App.vaultFilter === "archived") list = list.filter(function (i) { return i.archived; });
@@ -278,7 +255,6 @@
     if (!host) return;
     UI.clear(host);
     var list = computeList();
-
     if (!list.length) {
       host.appendChild(el("div", { class: "empty" }, [
         el("div", { class: "e-glyph", "aria-hidden": "true", text: "○" }),
@@ -287,14 +263,12 @@
           ? "Aucune idée ne correspond à « " + App.vaultQuery + " ». Essaie un nom d'ingrédient ou un ADN."
           : "Ce filtre ne contient aucune idée. Reviens à « Tout » ou crée une nouvelle explosion." }),
         el("div", { class: "btn-row" }, [
-          App.vaultQuery ? el("button", { class: "btn btn-ghost", type: "button", text: "Effacer la recherche",
-            onclick: function () { App.vaultQuery = ""; render(); } }) : null,
+          App.vaultQuery ? el("button", { class: "btn btn-ghost", type: "button", text: "Effacer la recherche", onclick: function () { App.vaultQuery = ""; render(); } }) : null,
           el("button", { class: "btn btn-primary", type: "button", text: "Nouvelle explosion", onclick: function () { go("fusion"); } })
         ])
       ]));
       return;
     }
-
     list.forEach(function (idea) {
       var wrap = el("div", { style: "position:relative" });
       wrap.appendChild(ideaCard(idea));
@@ -346,19 +320,13 @@
       body: el("div", {}, [
         el("button", { class: "option-row", type: "button",
           onclick: function () { UI.copyText(md).then(function (ok) { UI.toast(ok ? "Markdown copié." : "Copie refusée.", ok ? "ok" : "warn"); }); UI.closeModal(); }
-        }, [el("span", { class: "o-glyph", text: "▤" }), el("div", { class: "o-body" }, [
-          el("div", { class: "o-title", text: "Copier en Markdown" }),
-          el("div", { class: "o-desc", text: "Pour Notion, Obsidian, un dépôt Git…" })])]),
+        }, [el("span", { class: "o-glyph", text: "▤" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Copier en Markdown" }), el("div", { class: "o-desc", text: "Pour Notion, Obsidian, un dépôt Git…" })])]),
         el("button", { class: "option-row", type: "button",
           onclick: function () { UI.copyText(E.ideaToPlainText(idea)).then(function (ok) { UI.toast(ok ? "Texte copié." : "Copie refusée.", ok ? "ok" : "warn"); }); UI.closeModal(); }
-        }, [el("span", { class: "o-glyph", text: "▥" }), el("div", { class: "o-body" }, [
-          el("div", { class: "o-title", text: "Copier en texte brut" }),
-          el("div", { class: "o-desc", text: "Pour un e-mail, un message, une note rapide." })])]),
+        }, [el("span", { class: "o-glyph", text: "▥" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Copier en texte brut" }), el("div", { class: "o-desc", text: "Pour un e-mail, un message, une note rapide." })])]),
         el("button", { class: "option-row", type: "button",
           onclick: function () { var ok = UI.download(safeName(idea.name) + ".md", md, "text/markdown;charset=utf-8"); UI.toast(ok ? "Fichier .md préparé." : "Téléchargement refusé.", ok ? "ok" : "warn"); UI.closeModal(); }
-        }, [el("span", { class: "o-glyph", text: "⇩" }), el("div", { class: "o-body" }, [
-          el("div", { class: "o-title", text: "Télécharger un fichier .md" }),
-          el("div", { class: "o-desc", text: safeName(idea.name) + ".md" })])]),
+        }, [el("span", { class: "o-glyph", text: "⇩" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Télécharger un fichier .md" }), el("div", { class: "o-desc", text: safeName(idea.name) + ".md" })])]),
         el("button", { class: "option-row", type: "button",
           onclick: function () {
             UI.closeModal();
@@ -368,9 +336,7 @@
               else { var ok = UI.download(safeName(idea.name) + ".md", md, "text/markdown;charset=utf-8"); UI.toast(ok ? "Partage indisponible ici — fichier téléchargé." : "Partage et téléchargement indisponibles ici.", ok ? "info" : "warn"); }
             });
           }
-        }, [el("span", { class: "o-glyph", text: "↗" }), el("div", { class: "o-body" }, [
-          el("div", { class: "o-title", text: "Partager (feuille iOS)" }),
-          el("div", { class: "o-desc", text: "Envoie le dossier dans une autre app." })])])
+        }, [el("span", { class: "o-glyph", text: "↗" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Partager (feuille iOS)" }), el("div", { class: "o-desc", text: "Envoie le dossier dans une autre app." })])])
       ]),
       actions: [{ label: "Fermer", class: "btn-ghost", onClick: function () {} }]
     });
@@ -399,14 +365,10 @@
       body: el("div", {}, [
         el("button", { class: "option-row", type: "button",
           onclick: function () { var ok = UI.download("idea-explosion-vault.json", json, "application/json;charset=utf-8"); UI.toast(ok ? "Sauvegarde .json préparée." : "Téléchargement refusé.", ok ? "ok" : "warn"); UI.closeModal(); }
-        }, [el("span", { class: "o-glyph", text: "⇩" }), el("div", { class: "o-body" }, [
-          el("div", { class: "o-title", text: "Télécharger idea-explosion-vault.json" }),
-          el("div", { class: "o-desc", text: "À garder en lieu sûr : c'est ta sauvegarde." })])]),
+        }, [el("span", { class: "o-glyph", text: "⇩" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Télécharger idea-explosion-vault.json" }), el("div", { class: "o-desc", text: "À garder en lieu sûr : c'est ta sauvegarde." })])]),
         el("button", { class: "option-row", type: "button",
           onclick: function () { UI.copyText(json).then(function (ok) { UI.toast(ok ? "JSON copié (" + json.length + " caractères)." : "Copie refusée.", ok ? "ok" : "warn"); }); UI.closeModal(); }
-        }, [el("span", { class: "o-glyph", text: "▤" }), el("div", { class: "o-body" }, [
-          el("div", { class: "o-title", text: "Copier le JSON" }),
-          el("div", { class: "o-desc", text: json.length + " caractères" })])]),
+        }, [el("span", { class: "o-glyph", text: "▤" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Copier le JSON" }), el("div", { class: "o-desc", text: json.length + " caractères" })])]),
         el("button", { class: "option-row", type: "button",
           onclick: function () {
             UI.closeModal();
@@ -416,8 +378,7 @@
               else { var ok = UI.download("idea-explosion-vault.json", json, "application/json;charset=utf-8"); UI.toast(ok ? "Partage indisponible ici — fichier téléchargé." : "Partage et téléchargement indisponibles ici.", ok ? "info" : "warn"); }
             });
           }
-        }, [el("span", { class: "o-glyph", text: "↗" }), el("div", { class: "o-body" }, [
-          el("div", { class: "o-title", text: "Partager" }), el("div", { class: "o-desc", text: "Via la feuille de partage iOS." })])])
+        }, [el("span", { class: "o-glyph", text: "↗" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Partager" }), el("div", { class: "o-desc", text: "Via la feuille de partage iOS." })])])
       ]),
       actions: [{ label: "Fermer", class: "btn-ghost", onClick: function () {} }]
     });
@@ -441,9 +402,7 @@
       subtitle: "Choisis un fichier de sauvegarde ou colle le JSON directement.",
       body: el("div", {}, [
         el("button", { class: "option-row", type: "button", onclick: function () { fileInput.click(); } },
-          [el("span", { class: "o-glyph", text: "⇧" }), el("div", { class: "o-body" }, [
-            el("div", { class: "o-title", text: "Choisir un fichier .json" }),
-            el("div", { class: "o-desc", text: "Sélection depuis l'app Fichiers" })])]),
+          [el("span", { class: "o-glyph", text: "⇧" }), el("div", { class: "o-body" }, [el("div", { class: "o-title", text: "Choisir un fichier .json" }), el("div", { class: "o-desc", text: "Sélection depuis l'app Fichiers" })])]),
         fileInput,
         ta
       ]),
@@ -471,9 +430,7 @@
     });
   }
 
-  /* ==========================================================================
-     ROUTEUR DE RENDU
-     ========================================================================== */
+  /* ROUTEUR DE RENDU */
   function render() {
     var node;
     switch (App.screen) {
@@ -490,9 +447,7 @@
     updateBadge();
   }
 
-  /* ==========================================================================
-     INITIALISATION
-     ========================================================================== */
+  /* INITIALISATION */
   function init() {
     document.querySelectorAll("[data-nav]").forEach(function (btn) {
       btn.addEventListener("click", function () {
@@ -501,7 +456,6 @@
         go(target);
       });
     });
-
     document.addEventListener("keydown", function (e) { if (e.key === "Escape") UI.closeModal(); });
 
     var draft = S.loadDraft();
