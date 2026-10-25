@@ -1,38 +1,20 @@
 /* IDEA EXPLOSION - app.js (partie 1/2) - routeur + ecrans 1 a 4 */
 (function () {
   "use strict";
-
-  var el = IE_UI.el;
-  var UI = IE_UI;
-  var E = IE_ENGINE;
-  var S = IE_STORE;
-  var D = IE_DATA;
-
+  var el = IE_UI.el, UI = IE_UI, E = IE_ENGINE, S = IE_STORE, D = IE_DATA;
   var ROOT = document.getElementById("app");
 
   var App = {
-    screen: "lab",
-    stack: [],
+    screen: "lab", stack: [],
     labSelection: { kind: "kin.app" },
     labOrbs: [
-      { slot: "domain", id: "dom.sound" },
-      { slot: "domain", id: "dom.game" },
-      { slot: "object", id: "obj.mirror" },
-      { slot: "object", id: "obj.seed" },
-      { slot: "constraint", id: "con.two" },
-      { slot: "constraint", id: "con.one" },
-      { slot: "twist", id: "twit.memory" },
-      { slot: "twist", id: "twit.grow" }
+      { slot: "domain", id: "dom.sound" }, { slot: "domain", id: "dom.game" },
+      { slot: "object", id: "obj.mirror" }, { slot: "object", id: "obj.seed" },
+      { slot: "constraint", id: "con.two" }, { slot: "constraint", id: "con.one" },
+      { slot: "twist", id: "twit.memory" }, { slot: "twist", id: "twit.grow" }
     ],
-    fusion: null,
-    fusionSheet: null,
-    fusionSheetTarget: null,
-    armed: null,
-    currentIdea: null,
-    vaultQuery: "",
-    vaultFilter: "all",
-    vaultSort: "recent",
-    busy: false
+    fusion: null, fusionSheet: null, fusionSheetTarget: null, armed: null,
+    currentIdea: null, vaultQuery: "", vaultFilter: "all", vaultSort: "recent", busy: false
   };
 
   var SCREENS = ["lab", "fusion", "explosion", "blueprint", "tree", "vault"];
@@ -50,8 +32,7 @@
 
   function back() {
     var prev = App.stack.pop() || "lab";
-    App.screen = prev;
-    render();
+    App.screen = prev; render();
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -64,8 +45,8 @@
 
   function updateBadge() {
     var b = document.getElementById("vaultBadge");
-    var n = S.ideas().filter(function (i) { return !i.archived; }).length;
     if (!b) return;
+    var n = S.ideas().filter(function (i) { return !i.archived; }).length;
     if (n > 0) { b.hidden = false; b.textContent = n > 99 ? "99" : String(n); }
     else b.hidden = true;
   }
@@ -79,12 +60,7 @@
   function head(title, sub, opts) {
     opts = opts || {};
     var kids = [];
-    if (opts.back) {
-      kids.push(el("button", {
-        class: "back", type: "button", "aria-label": "Retour",
-        onclick: opts.back === true ? back : opts.back
-      }, [UI.icon("back")]));
-    }
+    if (opts.back) kids.push(el("button", { class: "back", type: "button", "aria-label": "Retour", onclick: opts.back === true ? back : opts.back }, [UI.icon("back")]));
     kids.push(el("div", {}, [
       opts.kicker ? el("span", { class: "kicker", text: opts.kicker }) : null,
       el("h1", { text: title }),
@@ -94,10 +70,7 @@
   }
 
   function sectionTitle(text, hint) {
-    return el("div", { class: "section-title" }, [
-      el("h2", { text: text }),
-      hint ? el("span", { class: "hint", text: hint }) : null
-    ]);
+    return el("div", { class: "section-title" }, [el("h2", { text: text }), hint ? el("span", { class: "hint", text: hint }) : null]);
   }
 
   function note(text, kind) {
@@ -109,10 +82,8 @@
 
   function chip(ing, selected, onClick, extra) {
     return el("button", {
-      class: "chip" + (selected ? " selected" : ""),
-      type: "button",
-      "aria-pressed": selected ? "true" : "false",
-      onclick: onClick
+      class: "chip" + (selected ? " selected" : ""), type: "button",
+      "aria-pressed": selected ? "true" : "false", onclick: onClick
     }, [
       el("span", { class: "glyph", text: ing.glyph, "aria-hidden": "true" }),
       el("span", { text: ing.label }),
@@ -121,15 +92,8 @@
   }
 
   function ideaCard(idea) {
-    var tint = IE_UI.tintFor(idea);
     var kind = UI.kindById(idea.combo.kind);
-    var tags = [
-      el("span", { class: "tag", text: kind ? kind.label : "—" }),
-      idea.mutationLabel ? el("span", { class: "tag good", text: "variante" }) : null,
-      idea.archived ? el("span", { class: "tag warn", text: "archivée" }) : null,
-      el("span", { class: "tag", text: UI.relTime(idea.updatedAt || idea.createdAt) })
-    ];
-
+    var tint = IE_UI.tintFor(idea);
     return el("div", {
       class: "idea-card", role: "button", tabindex: "0",
       onclick: function (e) { if (e.target.closest && e.target.closest(".star")) return; openIdea(idea.id); },
@@ -139,11 +103,15 @@
       el("div", { class: "body" }, [
         el("div", { class: "name", text: idea.name }),
         el("div", { class: "pitch", text: idea.pitch }),
-        el("div", { class: "tags" }, tags)
+        el("div", { class: "tags" }, [
+          el("span", { class: "tag", text: kind ? kind.label : "—" }),
+          idea.mutationLabel ? el("span", { class: "tag good", text: "variante" }) : null,
+          idea.archived ? el("span", { class: "tag warn", text: "archivée" }) : null,
+          el("span", { class: "tag", text: UI.relTime(idea.updatedAt || idea.createdAt) })
+        ])
       ]),
       el("button", {
-        class: "star" + (idea.favorite ? " on" : ""),
-        type: "button",
+        class: "star" + (idea.favorite ? " on" : ""), type: "button",
         "aria-label": idea.favorite ? "Retirer des favoris" : "Ajouter aux favoris",
         "aria-pressed": idea.favorite ? "true" : "false",
         onclick: function (e) { e.stopPropagation(); toggleFavorite(idea.id); }
@@ -177,22 +145,12 @@
 
   function startExplosion(combo, opts) {
     opts = opts || {};
-    if (!comboComplete(combo)) {
-      UI.toast("Il manque encore un ingrédient : domaine, objet et contrainte sont requis.", "warn");
-      return;
-    }
+    if (!comboComplete(combo)) { UI.toast("Il manque encore un ingrédient : domaine, objet et contrainte sont requis.", "warn"); return; }
     S.saveLastCombo(combo);
     App.busy = true;
     render();
-
-    var steps = [
-      "Alignement des ingrédients…",
-      "Fusion des champs de sens…",
-      "Calcul de l'ADN créatif…",
-      "Recomposition du concept…"
-    ];
+    var steps = ["Alignement des ingrédients…", "Fusion des champs de sens…", "Calcul de l'ADN créatif…", "Recomposition du concept…"];
     var idx = 0;
-
     var timer = setInterval(function () {
       idx++;
       var bar = document.getElementById("chargeBar");
@@ -200,24 +158,19 @@
       if (lbl && idx <= steps.length) lbl.textContent = steps[idx - 1];
       if (bar) bar.style.width = Math.min(100, (idx / steps.length) * 100) + "%";
     }, 340);
-
     setTimeout(function () {
       clearInterval(timer);
       var idea = E.generateIdea({
         kind: combo.kind, domain: combo.domain, object: combo.object,
         constraint: combo.constraint, twist: combo.twist || null,
         seed: opts.seed || (Date.now() >>> 0),
-        parentId: opts.parentId || null,
-        mutationLabel: opts.mutationLabel || null
+        parentId: opts.parentId || null, mutationLabel: opts.mutationLabel || null
       });
       App.busy = false;
       App.currentIdea = idea;
       render();
       var stage = document.querySelector(".explosion-stage");
-      if (stage) {
-        stage.classList.add("bursting");
-        setTimeout(function () { stage.classList.remove("bursting"); }, 1200);
-      }
+      if (stage) { stage.classList.add("bursting"); setTimeout(function () { stage.classList.remove("bursting"); }, 1200); }
       UI.toast("Idée générée. Pense à l'enregistrer dans le Vault.", "ok");
     }, 1450);
   }
@@ -232,15 +185,12 @@
     kids.push(el("div", { class: "hero reveal-seq" }, [
       el("span", { class: "kicker", text: "The Creative Chaos Engine" }),
       el("h1", { class: "display" }, [
-        document.createTextNode("Fais "),
-        el("span", { class: "accent", text: "exploser" }),
-        document.createTextNode(" une idée.")
+        document.createTextNode("Fais "), el("span", { class: "accent", text: "exploser" }), document.createTextNode(" une idée.")
       ]),
       el("p", { class: "lede", text: "Choisis des fragments, fais-les entrer en collision, et repars avec un concept exploitable — pas un paragraphe de texte." })
     ]));
 
     var field = el("div", { class: "orb-field" }, [el("div", { class: "grid-lines", "aria-hidden": "true" })]);
-
     App.labOrbs.forEach(function (entry, i) {
       var ing = (D.INGREDIENTS[entry.slot] || []).filter(function (x) { return x.id === entry.id; })[0];
       if (!ing) return;
@@ -253,18 +203,15 @@
       var size = 62 + ((i * 7) % 5) * 8;
       var tint = IE_UI.tintFor({ signature: { h1: 200 + i * 22, h2: 260 + i * 13 } });
       var selected = sel[entry.slot] === entry.id;
-
       field.appendChild(el("button", {
-        class: "float-orb",
-        type: "button",
+        class: "float-orb", type: "button",
         style: "top:" + pos.top + ";left:" + pos.left + ";width:" + size + "px;height:" + size +
           "px;--oc1:" + tint.raw + ";--oc2:" + tint.raw2 + ";--dur:" + (6 + (i % 4)) + "s;font-size:" + (size / 3.1) + "px",
         "aria-pressed": selected ? "true" : "false",
         "aria-label": ing.label + " — " + slotLabel(entry.slot),
         text: ing.glyph,
         onclick: function () {
-          if (sel[entry.slot] === entry.id) delete sel[entry.slot];
-          else sel[entry.slot] = entry.id;
+          if (sel[entry.slot] === entry.id) delete sel[entry.slot]; else sel[entry.slot] = entry.id;
           render();
         }
       }));
@@ -288,7 +235,7 @@
           el("span", { text: ing ? ing.label : "libre" })
         ])
       ]);
-    }));
+    })));
 
     kids.push(note("Le Lab ne fait aucune requête : tout se calcule sur ton appareil. L'IA n'est pas branchée — le moteur recompose des fragments, il n'invente pas à ta place.", ""));
     kids.push(el("div", { style: "height:14px" }));
@@ -302,8 +249,7 @@
     var canGo = pickedCount >= 3 && !!sel.kind;
     kids.push(el("button", {
       class: "btn " + (canGo ? "btn-primary" : "btn-ghost") + " btn-block",
-      type: "button",
-      "aria-disabled": canGo ? "false" : "true",
+      type: "button", "aria-disabled": canGo ? "false" : "true",
       onclick: function () {
         if (!canGo) { UI.toast("Ajoute au moins domaine, objet et contrainte pour ouvrir la Fusion Chamber.", "warn"); return; }
         App.fusion = { kind: sel.kind, domain: sel.domain || null, object: sel.object || null, constraint: sel.constraint || null, twist: sel.twist || null };
@@ -312,14 +258,12 @@
     }, [UI.icon("spark"), document.createTextNode(canGo ? "Créer une explosion" : "Sélectionne 3 fragments")]));
 
     kids.push(sectionTitle("Historique récent", recent.length ? recent.length + " sur " + S.ideas().length : "vide"));
-
     if (!recent.length) {
       kids.push(el("div", { class: "empty" }, [
         el("div", { class: "e-glyph", "aria-hidden": "true", text: "✧" }),
         el("h3", { text: "Aucune idée encore" }),
         el("p", { text: "Ta première explosion prendra environ deux minutes : choisis trois fragments ci-dessus." }),
-        el("button", {
-          class: "btn btn-primary", type: "button", text: "Ouvrir la Fusion Chamber",
+        el("button", { class: "btn btn-primary", type: "button", text: "Ouvrir la Fusion Chamber",
           onclick: function () {
             if (!App.fusion) App.fusion = { kind: sel.kind, domain: sel.domain || null, object: sel.object || null, constraint: sel.constraint || null, twist: sel.twist || null };
             go("fusion");
@@ -331,10 +275,7 @@
       kids.push(el("button", { class: "btn btn-ghost btn-block", type: "button", onclick: function () { go("vault"); } },
         [UI.icon("archive"), document.createTextNode("Ouvrir tout le Vault")]));
     }
-
-    if (last) kids.push(el("p", { class: "faint", style: "margin-top:16px;font-size:12.5px;text-align:center",
-      text: "Dernier combo utilisé : " + [last.domain, last.object, last.constraint].join(" · ") }));
-
+    if (last) kids.push(el("p", { class: "faint", style: "margin-top:16px;font-size:12.5px;text-align:center", text: "Dernier combo utilisé : " + [last.domain, last.object, last.constraint].join(" · ") }));
     return screenEl(kids, "lab");
   }
 
@@ -342,9 +283,7 @@
   function renderFusion() {
     var kids = [];
     var f = App.fusion;
-    if (!f) {
-      f = App.fusion = { kind: App.labSelection.kind || "kin.app", domain: App.labSelection.domain || null, object: App.labSelection.object || null, constraint: App.labSelection.constraint || null, twist: App.labSelection.twist || null };
-    }
+    if (!f) f = App.fusion = { kind: App.labSelection.kind || "kin.app", domain: App.labSelection.domain || null, object: App.labSelection.object || null, constraint: App.labSelection.constraint || null, twist: App.labSelection.twist || null };
     var filled = ["domain", "object", "constraint"].filter(function (k) { return f[k]; }).length;
 
     kids.push(head("Fusion Chamber", filled + "/3 ingrédients requis", { back: true }));
@@ -366,10 +305,9 @@
     ]);
 
     ["domain", "object", "constraint"].forEach(function (slot, i) {
-      var current = f[slot];
       var pool = D.INGREDIENTS[slot] || [];
-      var sample = pool[i % pool.length];
-      var ing = current ? pool.filter(function (x) { return x.id === current; })[0] : sample;
+      var current = f[slot];
+      var ing = current ? pool.filter(function (x) { return x.id === current; })[0] : pool[i % pool.length];
       if (!ing) return;
       var dc = el("button", {
         class: "chip drag-chip", type: "button",
@@ -383,32 +321,23 @@
       makeDraggable(dc, stage, core, slot);
       stage.appendChild(dc);
     });
-
     kids.push(stage);
 
     kids.push(el("div", { class: "slot-rail" }, D.SLOTS.filter(function (s) { return s.key !== "kind"; }).map(function (s) {
       var id = f[s.key];
       var ing = id ? (D.INGREDIENTS[s.key] || []).filter(function (x) { return x.id === id; })[0] : null;
       var required = s.key !== "twist";
-
-      return el("div", {
-        class: "slot-row " + (ing ? "filled" : "") + (App.armed === s.key ? " armed" : ""),
-        id: "slotRow-" + s.key
-      }, [
+      return el("div", { class: "slot-row " + (ing ? "filled" : "") + (App.armed === s.key ? " armed" : ""), id: "slotRow-" + s.key }, [
         el("div", { class: "slot-key", "aria-hidden": "true", text: s.icon }),
         el("div", { class: "slot-body" }, [
           el("span", { class: "lbl", text: s.label + (required ? " · requis" : " · optionnel") }),
           el("span", { class: "val " + (ing ? "" : "muted"), text: ing ? ing.glyph + "  " + ing.label : "— à définir" })
         ]),
         el("div", { class: "slot-actions" }, [
-          ing ? el("button", {
-            class: "icon-sm", type: "button", "aria-label": "Remettre à zéro " + s.label, text: "✕",
-            onclick: function (e) { e.stopPropagation(); f[s.key] = null; S.saveDraft(f); render(); }
-          }) : null,
-          el("button", {
-            class: "icon-sm", type: "button", "aria-label": "Choisir " + s.label,
-            onclick: function () { openIngredientSheet(s.key, "core"); }
-          }, [UI.icon("swap")])
+          ing ? el("button", { class: "icon-sm", type: "button", "aria-label": "Remettre à zéro " + s.label, text: "✕",
+            onclick: function (e) { e.stopPropagation(); f[s.key] = null; S.saveDraft(f); render(); } }) : null,
+          el("button", { class: "icon-sm", type: "button", "aria-label": "Choisir " + s.label,
+            onclick: function () { openIngredientSheet(s.key, "core"); } }, [UI.icon("swap")])
         ])
       ]);
     })));
@@ -426,8 +355,7 @@
     var ready = filled >= 3;
     kids.push(el("div", { class: "sticky-cta" }, [
       el("button", {
-        class: "btn " + (ready ? "btn-primary" : "btn-ghost") + " btn-block",
-        type: "button",
+        class: "btn " + (ready ? "btn-primary" : "btn-ghost") + " btn-block", type: "button",
         "aria-disabled": ready ? "false" : "true",
         onclick: function () {
           if (!ready) { UI.toast("Il manque " + (3 - filled) + " ingrédient(s) obligatoire(s).", "warn"); return; }
@@ -436,8 +364,7 @@
         }
       }, [UI.icon("spark"), document.createTextNode(ready ? "Déclencher l'explosion" : "Encore " + (3 - filled) + " à choisir")]),
       el("div", { class: "btn-row", style: "margin-top:10px" }, [
-        el("button", {
-          class: "btn btn-ghost btn-sm", type: "button",
+        el("button", { class: "btn btn-ghost btn-sm", type: "button",
           onclick: function () {
             ["domain", "object", "constraint", "twist"].forEach(function (k) {
               var pool = D.INGREDIENTS[k];
@@ -448,49 +375,38 @@
             render();
           }
         }, [UI.icon("shuffle"), document.createTextNode("Tout au hasard")]),
-        el("button", {
-          class: "btn btn-ghost btn-sm", type: "button",
+        el("button", { class: "btn btn-ghost btn-sm", type: "button",
           onclick: function () {
             f.domain = f.object = f.constraint = f.twist = null;
-            App.fusionSheet = null;
-            S.saveDraft(f);
+            App.fusionSheet = null; S.saveDraft(f);
             UI.toast("Sélection vidée.", "info");
             render();
           }
         }, [document.createTextNode("Vider")])
       ])
     ]));
-
     return screenEl(kids, "fusion");
   }
 
   function openIngredientSheet(slot, target) {
-    App.fusionSheet = slot;
-    App.fusionSheetTarget = target;
-    App.armed = slot;
-    render();
+    App.fusionSheet = slot; App.fusionSheetTarget = target; App.armed = slot; render();
   }
 
   function ingredientSheet(slot, target, f) {
     var s = D.SLOTS.filter(function (x) { return x.key === slot; })[0];
-    var list = D.INGREDIENTS[slot] || [];
     var wrap = el("div", { class: "sheet" }, [
       el("span", { class: "sheet-title", text: "Choisir un ingrédient — " + s.label }),
       el("p", { class: "faint", style: "font-size:12.5px;width:100%;margin:0 0 6px", text: s.help })
     ]);
-    list.forEach(function (ing) {
+    (D.INGREDIENTS[slot] || []).forEach(function (ing) {
       wrap.appendChild(chip(ing, f[slot] === ing.id, function () {
         f[slot] = ing.id;
-        App.fusionSheet = null;
-        App.fusionSheetTarget = null;
-        App.armed = null;
-        S.saveDraft(f);
-        render();
+        App.fusionSheet = null; App.fusionSheetTarget = null; App.armed = null;
+        S.saveDraft(f); render();
         UI.toast(s.label + " : " + ing.label, "ok");
       }));
     });
-    wrap.appendChild(el("button", {
-      class: "link-btn", type: "button",
+    wrap.appendChild(el("button", { class: "link-btn", type: "button",
       onclick: function () {
         if (slot === "twist") f.twist = null; else f[slot] = null;
         App.fusionSheet = null; App.fusionSheetTarget = null; App.armed = null;
@@ -503,7 +419,6 @@
 
   function makeDraggable(node, stage, coreEl, slot) {
     var startX = 0, startY = 0, dragging = false, moved = false;
-
     function onDown(e) {
       if (e.pointerType === "mouse" && e.button !== 0) return;
       dragging = true; moved = false;
@@ -535,7 +450,6 @@
         else UI.toast("Dépose le fragment sur le cœur, ou touche « Choisir » sur sa ligne.", "info");
       }
     }
-
     node.addEventListener("pointerdown", onDown);
     node.addEventListener("pointermove", onMove);
     node.addEventListener("pointerup", onUp);
@@ -545,7 +459,6 @@
   /* ECRAN 3 - THE EXPLOSION */
   function renderExplosion() {
     var kids = [];
-
     if (App.busy) {
       kids.push(head("The Explosion", "génération en cours"));
       kids.push(el("div", { class: "explosion-stage" }, [
@@ -594,7 +507,6 @@
         ])
       ])
     ]));
-
     kids.push(UI.signatureArt(idea));
 
     kids.push(sectionTitle("Ingrédients", "touche pour remplacer"));
@@ -605,27 +517,19 @@
 
     kids.push(el("div", { style: "height:8px" }));
     kids.push(el("div", { class: "btn-row" }, [
-      el("button", {
-        class: "btn btn-primary", type: "button",
+      el("button", { class: "btn btn-primary", type: "button",
         onclick: function () {
-          var fresh = E.generateIdea({
-            kind: idea.combo.kind, domain: idea.combo.domain, object: idea.combo.object,
-            constraint: idea.combo.constraint, twist: idea.combo.twist, seed: Date.now() >>> 0
-          });
-          App.currentIdea = fresh;
+          App.currentIdea = E.generateIdea({ kind: idea.combo.kind, domain: idea.combo.domain, object: idea.combo.object, constraint: idea.combo.constraint, twist: idea.combo.twist, seed: Date.now() >>> 0 });
           render();
           UI.toast("Nouveau tirage avec les mêmes ingrédients.", "ok");
         }
       }, [UI.icon("shuffle"), document.createTextNode("Relancer")]),
-      el("button", { class: "btn btn-ghost", type: "button", onclick: function () { go("tree"); } },
-        [UI.icon("tree"), document.createTextNode("Muter")])
+      el("button", { class: "btn btn-ghost", type: "button", onclick: function () { go("tree"); } }, [UI.icon("tree"), document.createTextNode("Muter")])
     ]));
 
     kids.push(el("div", { class: "btn-row", style: "margin-top:10px" }, [
-      el("button", {
-        class: "btn " + (saved ? "btn-ghost" : "btn-coral"), type: "button",
-        onclick: function () { saveIdea(idea); }
-      }, [UI.icon("archive"), document.createTextNode(saved ? "Enregistrer une copie" : "Enregistrer dans le Vault")]),
+      el("button", { class: "btn " + (saved ? "btn-ghost" : "btn-coral"), type: "button", onclick: function () { saveIdea(idea); } },
+        [UI.icon("archive"), document.createTextNode(saved ? "Enregistrer une copie" : "Enregistrer dans le Vault")]),
       el("button", { class: "btn btn-ghost", type: "button", onclick: function () { go("blueprint"); } },
         [UI.icon("doc"), document.createTextNode("Blueprint")])
     ]));
@@ -635,29 +539,19 @@
 
     kids.push(sectionTitle("Export rapide", "copier le concept"));
     kids.push(el("div", { class: "btn-row" }, [
-      el("button", {
-        class: "btn btn-ghost btn-sm", type: "button",
-        onclick: function () {
-          UI.copyText(idea.name + " — " + idea.pitch).then(function (ok) { UI.toast(ok ? "Concept copié." : "Copie refusée par le navigateur.", ok ? "ok" : "warn"); });
-        }
+      el("button", { class: "btn btn-ghost btn-sm", type: "button",
+        onclick: function () { UI.copyText(idea.name + " — " + idea.pitch).then(function (ok) { UI.toast(ok ? "Concept copié." : "Copie refusée par le navigateur.", ok ? "ok" : "warn"); }); }
       }, [UI.icon("copy"), document.createTextNode("Copier le pitch")]),
-      el("button", {
-        class: "btn btn-ghost btn-sm", type: "button",
-        onclick: function () {
-          UI.copyText(E.ideaToPlainText(idea)).then(function (ok) { UI.toast(ok ? "Blueprint complet copié." : "Copie refusée par le navigateur.", ok ? "ok" : "warn"); });
-        }
+      el("button", { class: "btn btn-ghost btn-sm", type: "button",
+        onclick: function () { UI.copyText(E.ideaToPlainText(idea)).then(function (ok) { UI.toast(ok ? "Blueprint complet copié." : "Copie refusée par le navigateur.", ok ? "ok" : "warn"); }); }
       }, [document.createTextNode("Copier tout le dossier")])
     ]));
-
     return screenEl(kids, "explosion");
   }
 
   function saveIdea(idea) {
     var payload = JSON.parse(JSON.stringify(idea));
-    if (S.get(payload.id)) {
-      delete payload.id;
-      payload.name = payload.name + " (copie)";
-    }
+    if (S.get(payload.id)) { delete payload.id; payload.name = payload.name + " (copie)"; }
     var res = S.add(payload);
     App.currentIdea = res.idea;
     UI.toast(res.result.persisted ? "Enregistrée dans le Vault." : "Idée gardée en mémoire seulement : le stockage local est indisponible.", res.result.persisted ? "ok" : "warn");
@@ -667,19 +561,16 @@
 
   function openSwapSheet(idea, slot) {
     var s = D.SLOTS.filter(function (x) { return x.key === slot; })[0];
-    var list = D.INGREDIENTS[slot] || [];
     var wrap = el("div", {});
-    list.forEach(function (ing) {
+    (D.INGREDIENTS[slot] || []).forEach(function (ing) {
       var active = idea.combo[slot] === ing.id;
-      wrap.appendChild(el("button", {
-        class: "option-row", type: "button",
+      wrap.appendChild(el("button", { class: "option-row", type: "button",
         onclick: function () {
           UI.closeModal();
-          var working = JSON.parse(JSON.stringify(idea.combo));
-          working[slot] = ing.id;
+          var c = JSON.parse(JSON.stringify(idea.combo));
+          c[slot] = ing.id;
           var rebuilt = E.generateIdea({
-            kind: working.kind, domain: working.domain, object: working.object,
-            constraint: working.constraint, twist: working.twist,
+            kind: c.kind, domain: c.domain, object: c.object, constraint: c.constraint, twist: c.twist,
             seed: (idea.seed + E.hashString(slot + ing.id)) >>> 0,
             parentId: S.get(idea.id) ? idea.id : null,
             mutationLabel: s.label + " → " + ing.label,
@@ -699,20 +590,13 @@
         active ? el("span", { class: "tag good", text: "actuel" }) : null
       ]));
     });
-
-    UI.modal({
-      title: "Remplacer — " + s.label,
-      subtitle: "L'idée se recompose avec ce nouvel ingrédient.",
-      body: wrap,
-      actions: [{ label: "Fermer", class: "btn-ghost", onClick: function () {} }]
-    });
+    UI.modal({ title: "Remplacer — " + s.label, subtitle: "L'idée se recompose avec ce nouvel ingrédient.", body: wrap, actions: [{ label: "Fermer", class: "btn-ghost", onClick: function () {} }] });
   }
 
   /* ECRAN 4 - IDEA BLUEPRINT */
   function renderBlueprint() {
     var kids = [];
     var idea = App.currentIdea;
-
     if (!idea) {
       kids.push(head("Idea Blueprint", "aucune idée active", { back: true }));
       kids.push(el("div", { class: "empty" }, [
@@ -723,48 +607,28 @@
       ]));
       return screenEl(kids, "blueprint");
     }
-
     var b = idea.blueprint;
     var kind = UI.kindById(idea.combo.kind);
     kids.push(head(idea.name, (kind ? kind.label : "") + " · " + idea.adn, { back: true }));
 
-    kids.push(el("div", { class: "card card-glow" }, [
-      el("span", { class: "kicker", text: "Résumé" }),
-      el("p", { class: "bp-text", text: idea.pitch })
-    ]));
-
-    kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [
-      el("h3", { text: "Problème" }), el("p", { class: "bp-text", text: b.problem })
-    ])]));
-
-    kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [
-      el("h3", { text: "Public cible" }), el("p", { class: "bp-text", text: b.audience })
-    ])]));
-
+    kids.push(el("div", { class: "card card-glow" }, [el("span", { class: "kicker", text: "Résumé" }), el("p", { class: "bp-text", text: idea.pitch })]));
+    kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [el("h3", { text: "Problème" }), el("p", { class: "bp-text", text: b.problem })])]));
+    kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [el("h3", { text: "Public cible" }), el("p", { class: "bp-text", text: b.audience })])]));
     kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [
       el("h3", { text: "Fonctionnalités" }),
-      el("ul", { class: "bp-list" }, b.features.map(function (f, i) {
-        return el("li", {}, [el("span", { class: "mark", text: String(i + 1) }), el("span", { text: f })]);
-      }))
+      el("ul", { class: "bp-list" }, b.features.map(function (f, i) { return el("li", {}, [el("span", { class: "mark", text: String(i + 1) }), el("span", { text: f })]); }))
     ])]));
-
     kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [
       el("h3", { text: "Parcours utilisateur" }),
       el("ol", { class: "steps" }, b.journey.map(function (j) { return el("li", {}, [el("span", { text: j })]); }))
     ])]));
-
     kids.push(el("div", { class: "card" }, [
-      el("div", { class: "bp-block", style: "margin-bottom:14px" }, [
-        el("h3", { text: "Direction artistique" }), el("p", { class: "bp-text", text: b.artDirection })
-      ]),
+      el("div", { class: "bp-block", style: "margin-bottom:14px" }, [el("h3", { text: "Direction artistique" }), el("p", { class: "bp-text", text: b.artDirection })]),
       el("div", { class: "bp-block", style: "margin-bottom:0" }, [
         el("h3", { text: "Livrables du format « " + (kind ? kind.label : "") + " »" }),
-        el("ul", { class: "bp-list" }, b.deliverable.map(function (d) {
-          return el("li", {}, [el("span", { class: "mark", text: "✓" }), el("span", { text: d })]);
-        }))
+        el("ul", { class: "bp-list" }, b.deliverable.map(function (d) { return el("li", {}, [el("span", { class: "mark", text: "✓" }), el("span", { text: d })]); }))
       ])
     ]));
-
     kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [
       el("h3", { text: "Difficulté estimée" }),
       el("p", { class: "bp-text", style: "font-weight:750;font-size:16px", text: b.difficulty.label + " (" + b.difficulty.score + " / " + b.difficulty.max + ")" }),
@@ -778,19 +642,13 @@
       ]),
       el("p", { class: "faint", style: "font-size:12px;margin-top:8px", text: b.budget.note })
     ])]));
-
     kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [
       el("h3", { text: "Pistes de monétisation" }),
-      el("ul", { class: "bp-list" }, b.monetization.map(function (m) {
-        return el("li", {}, [el("span", { class: "mark", text: "€" }), el("span", { text: m })]);
-      }))
+      el("ul", { class: "bp-list" }, b.monetization.map(function (m) { return el("li", {}, [el("span", { class: "mark", text: "€" }), el("span", { text: m })]); }))
     ])]));
-
     kids.push(el("div", { class: "card" }, [el("div", { class: "bp-block", style: "margin-bottom:0" }, [
       el("h3", { text: "Risques identifiés" }),
-      el("ul", { class: "bp-list" }, b.risks.map(function (x) {
-        return el("li", {}, [el("span", { class: "mark", text: "!" }), el("span", { text: x })]);
-      }))
+      el("ul", { class: "bp-list" }, b.risks.map(function (x) { return el("li", {}, [el("span", { class: "mark", text: "!" }), el("span", { text: x })]); }))
     ])]));
 
     kids.push(sectionTitle("Export du dossier", "copie, fichier ou partage"));
@@ -811,21 +669,13 @@
         }
       }, [UI.icon("share"), document.createTextNode("Partager")])
     ]));
-
     kids.push(el("div", { class: "btn-row", style: "margin-top:10px" }, [
-      el("button", { class: "btn btn-primary", type: "button", onclick: function () { go("tree"); } },
-        [UI.icon("tree"), document.createTextNode("Explorer les mutations")]),
-      el("button", { class: "btn btn-ghost", type: "button", onclick: function () { go("explosion"); } },
-        [document.createTextNode("Retour à l'idée")])
+      el("button", { class: "btn btn-primary", type: "button", onclick: function () { go("tree"); } }, [UI.icon("tree"), document.createTextNode("Explorer les mutations")]),
+      el("button", { class: "btn btn-ghost", type: "button", onclick: function () { go("explosion"); } }, [document.createTextNode("Retour à l'idée")])
     ]));
-
     return screenEl(kids, "blueprint");
   }
 
   function safeName(name) {
     return (name || "idee").replace(/[^\p{L}\p{N} _-]/gu, "").trim().slice(0, 60) || "idee";
   }
-
-  /* Les ecrans 5 et 6, le routeur et l'initialisation vivent dans app.js (partie 2/2),
-     ajoutes au meme fichier lors de la poussee suivante. */
-})();
