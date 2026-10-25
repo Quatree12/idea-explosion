@@ -1,4 +1,7 @@
-:root {
+:root {.chip .glyph, .mini-slot .val, .slot-key, .tag, .sig-glyph, .idea-card .thumb {
+  font-family: "Apple Symbols", "Segoe UI Symbol", -apple-system, sans-serif;
+  font-variant-emoji: text;
+}
   --abyss: #0B0B12;
   --abyss-2: #12121C;
   --violet: #B7A4FF;
