@@ -1,18 +1,1 @@
-/* IDEA EXPLOSION - extrait a concatenner a la fin de styles.css
-   Deux corrections : espace sous le CTA de la Fusion, et police de repli
-   explicite pour les glyphes Unicode. */
-
-.screen[data-screen="fusion"] { padding-bottom: 300px; }
-
-.chip .glyph,
-.mini-slot .val,
-.slot-key,
-.tag,
-.sig-glyph,
-.idea-card .thumb,
-.orb-legend strong,
-.option-row .o-glyph {
-  font-family: "Symbola", "Noto Sans Symbols 2", "Apple Symbols", "Segoe UI Symbol", -apple-system, sans-serif;
-  font-variant-emoji: text;
-  text-rendering: optimizeLegibility;
-}
+/* IDEA EXPLOSION - correctif a ajouter en fin de styles.css. Onglet "Fichiers" non requis : ce bloc est deja inclus ci-dessous dans index.html.
